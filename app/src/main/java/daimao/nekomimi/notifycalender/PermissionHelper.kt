@@ -34,9 +34,6 @@ object PermissionHelper {
     }
 
     fun openAppNotificationSettings(context: Context) {
-        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            return
-        }
         val intent = Intent()
         intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
         intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
@@ -46,14 +43,16 @@ object PermissionHelper {
     private var requestPermissionLauncher: ActivityResultLauncher<String>? = null
     private var permissionContinuation: CancellableContinuation<Boolean>? = null
 
-    suspend fun requestPermission(activity: ComponentActivity): Boolean {
+    fun register(activity: ComponentActivity) {
         requestPermissionLauncher = activity.registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             permissionContinuation?.resume(isGranted)
             permissionContinuation = null
         }
+    }
 
+    suspend fun requestPermission(): Boolean {
         try {
             return suspendCancellableCoroutine { continuation ->
                 permissionContinuation = continuation
