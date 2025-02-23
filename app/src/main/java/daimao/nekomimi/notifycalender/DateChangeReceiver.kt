@@ -11,6 +11,7 @@ class DateChangeReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         postNotification(context)
+        setAlarm(context)
     }
 
     companion object {
