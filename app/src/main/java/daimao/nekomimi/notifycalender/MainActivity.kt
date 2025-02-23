@@ -27,6 +27,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        createNotificationChannel(applicationContext);
     }
 }
 
