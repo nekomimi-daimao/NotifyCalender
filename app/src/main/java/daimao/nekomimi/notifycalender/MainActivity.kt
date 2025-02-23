@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,8 +19,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import daimao.nekomimi.notifycalender.ui.theme.NotifyCalenderTheme
@@ -42,8 +46,26 @@ class MainActivity : ComponentActivity() {
 fun App(activity: ComponentActivity) {
     return NotifyCalenderTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Permissions(activity, innerPadding)
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Permissions(activity, innerPadding)
+                ButtonPostNotification()
+            }
         }
+    }
+}
+
+@Preview
+@Composable
+fun ButtonPostNotification() {
+    val context = LocalContext.current
+    Button(onClick = {
+        postNotification(context)
+    }) {
+        Text("Post Notification")
     }
 }
 
@@ -67,7 +89,10 @@ fun Permissions(activity: ComponentActivity, innerPadding: PaddingValues) {
 
     val scope = rememberCoroutineScope()
 
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         Text(
             text = permissionState.value.toString(),
             Modifier.padding(innerPadding)
