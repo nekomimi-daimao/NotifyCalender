@@ -37,7 +37,9 @@ fun postNotification(context: Context) {
         .setAllowSystemGeneratedContextualActions(false)
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .setDeleteIntent(DateChangeReceiver.createPendingIntent(context))
-    NotificationManagerCompat.from(context).notify(notificationId, builder.build());
+    NotificationManagerCompat.from(context).notify(notificationId, builder.build())
+
+    DateChangeReceiver.setAlarm(context)
 }
 
 fun cancelNotification(context: Context): Unit {
@@ -50,7 +52,7 @@ fun cancelNotification(context: Context): Unit {
 fun formatDate(): String {
     val locales = ConfigurationCompat.getLocales(Resources.getSystem().configuration)
     val locale = locales.get(0)
-    val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd:E", locale)
+    val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd : E", locale)
     return LocalDate.now().format(formatter)
 }
 
