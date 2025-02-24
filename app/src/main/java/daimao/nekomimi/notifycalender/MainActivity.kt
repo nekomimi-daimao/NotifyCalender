@@ -113,7 +113,7 @@ fun Permissions(activity: ComponentActivity, innerPadding: PaddingValues) {
         } else {
             Button(
                 onClick = {
-                    if (!PermissionHelper.willShowPermissionRequest(activity)) {
+                    if (PermissionHelper.willShowPermissionRequest(activity)) {
                         PermissionHelper.openAppNotificationSettings(activity)
                         return@Button
                     }
