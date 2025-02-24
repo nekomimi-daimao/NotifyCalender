@@ -17,6 +17,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,6 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import daimao.nekomimi.notifycalender.ui.theme.NotifyCalenderTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -40,6 +44,21 @@ class MainActivity : ComponentActivity() {
 
         createNotificationChannel(applicationContext)
         PermissionHelper.register(this)
+
+        CoroutineScope(Dispatchers.Default).launch {
+            if (!PermissionHelper.hasNotifyPermission(this@MainActivity)) {
+                return@launch
+            }
+            loadAllowPostState(this@MainActivity).collectLatest {
+                if (it) {
+                    postNotification(this@MainActivity)
+                } else {
+                    cancelNotification(this@MainActivity)
+                    saveAllowPostState(this@MainActivity, false)
+                }
+            }
+
+        }
     }
 }
 
@@ -94,7 +113,7 @@ fun Permissions(activity: ComponentActivity, innerPadding: PaddingValues) {
         } else {
             Button(
                 onClick = {
-                    if (PermissionHelper.willShowPermissionRequest(activity)) {
+                    if (!PermissionHelper.willShowPermissionRequest(activity)) {
                         PermissionHelper.openAppNotificationSettings(activity)
                         return@Button
                     }
@@ -108,14 +127,22 @@ fun Permissions(activity: ComponentActivity, innerPadding: PaddingValues) {
 
 }
 
-
 @Preview
 @Composable
 fun ButtonPostNotification() {
     val context = LocalContext.current
-    Button(onClick = {
-        postNotification(context)
-    }) {
+    val allowPostState = remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        loadAllowPostState(context).collectLatest {
+            allowPostState.value = it;
+        }
+    }
+
+    Button(
+        enabled = allowPostState.value,
+        onClick = {
+            postNotification(context)
+        }) {
         Text("Post Notification")
     }
 }
@@ -127,12 +154,22 @@ fun SwitchAllowPost(context: Context) {
 
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit) {
+        loadAllowPostState(context).collectLatest {
+            allowPostState.value = it;
+        }
+    }
+
     Switch(
         checked = allowPostState.value,
         enabled = allowSwitch.value,
         onCheckedChange = {
             scope.launch {
                 try {
+                    if (!PermissionHelper.hasNotifyPermission(context)) {
+                        saveAllowPostState(context, false)
+                        return@launch
+                    }
                     allowSwitch.value = false
                     saveAllowPostState(context, it)
                     allowPostState.value = it
