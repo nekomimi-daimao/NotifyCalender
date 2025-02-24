@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.res.Resources
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.os.ConfigurationCompat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -46,7 +48,9 @@ fun cancelNotification(context: Context): Unit {
 }
 
 fun formatDate(): String {
-    val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd:EEEE")
+    val locales = ConfigurationCompat.getLocales(Resources.getSystem().configuration)
+    val locale = locales.get(0)
+    val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd:E", locale)
     return LocalDate.now().format(formatter)
 }
 
