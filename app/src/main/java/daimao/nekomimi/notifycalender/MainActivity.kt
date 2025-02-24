@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -53,21 +54,12 @@ fun App(activity: ComponentActivity) {
             ) {
                 Permissions(activity, innerPadding)
                 ButtonPostNotification()
+                SwitchAllowPost(activity)
             }
         }
     }
 }
 
-@Preview
-@Composable
-fun ButtonPostNotification() {
-    val context = LocalContext.current
-    Button(onClick = {
-        postNotification(context)
-    }) {
-        Text("Post Notification")
-    }
-}
 
 @Composable
 fun Permissions(activity: ComponentActivity, innerPadding: PaddingValues) {
@@ -116,3 +108,38 @@ fun Permissions(activity: ComponentActivity, innerPadding: PaddingValues) {
 
 }
 
+
+@Preview
+@Composable
+fun ButtonPostNotification() {
+    val context = LocalContext.current
+    Button(onClick = {
+        postNotification(context)
+    }) {
+        Text("Post Notification")
+    }
+}
+
+@Composable
+fun SwitchAllowPost(context: Context) {
+    val allowPostState = remember { mutableStateOf(false) }
+    val allowSwitch = remember { mutableStateOf(true) }
+
+    val scope = rememberCoroutineScope()
+
+    Switch(
+        checked = allowPostState.value,
+        enabled = allowSwitch.value,
+        onCheckedChange = {
+            scope.launch {
+                try {
+                    allowSwitch.value = false
+                    saveAllowPostState(context, it)
+                    allowPostState.value = it
+                } finally {
+                    allowSwitch.value = true
+                }
+            }
+        }
+    )
+}
