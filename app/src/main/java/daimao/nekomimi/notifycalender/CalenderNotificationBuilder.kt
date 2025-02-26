@@ -20,6 +20,7 @@ fun createNotificationChannel(context: Context): Unit {
     val importance = NotificationManager.IMPORTANCE_LOW
     val channel = NotificationChannel(CHANNEL_ID, name, importance)
     channel.description = descriptionText
+    channel.setShowBadge(false)
     NotificationManagerCompat.from(context).createNotificationChannel(channel)
 }
 
