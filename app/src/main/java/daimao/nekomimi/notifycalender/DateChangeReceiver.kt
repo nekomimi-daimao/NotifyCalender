@@ -24,13 +24,13 @@ class DateChangeReceiver : BroadcastReceiver() {
                 context,
                 0,
                 intent,
-                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
         }
 
         fun setAlarm(context: Context) {
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val pendingIntent = createPendingIntent(context)
+            val alarmManager = context.applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val pendingIntent = createPendingIntent(context.applicationContext)
 
             alarmManager.cancel(pendingIntent);
 
