@@ -33,6 +33,7 @@ class DateChangeReceiver : BroadcastReceiver() {
                 timeInMillis = System.currentTimeMillis()
                 set(Calendar.HOUR_OF_DAY, 0)
                 set(Calendar.MINUTE, 3)
+                add(Calendar.DATE, 1)
             }
 
             alarmManager.setInexactRepeating(
