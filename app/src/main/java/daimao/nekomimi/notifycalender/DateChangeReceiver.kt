@@ -20,7 +20,12 @@ class DateChangeReceiver : BroadcastReceiver() {
                 context,
                 DateChangeReceiver::class.java
             )
-            return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            return PendingIntent.getBroadcast(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
         }
 
         fun setAlarm(context: Context) {
