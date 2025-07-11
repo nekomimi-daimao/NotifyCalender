@@ -14,6 +14,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -77,3 +80,29 @@ jobs:
       #   with:
       #     name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
       #     path: ${{ env.main_project_module }}/build/outputs/bundle/release/
+
+      - name: Checkout Artifact Branch
+        uses: actions/checkout@v4
+        with:
+          ref: artifacts
+
+      - name: Delete Old Artifact
+        run: |
+          rm -rf ./artifacts
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.date_today }}-${{ env.repository_name }}-APK-debug
+          path: ./artifacts
+
+      - name: Commit Artifact Build
+        run: |
+          git remote set-url origin https://github-actions:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git add -f ./artifacts
+          git status
+          git commit -m ${{ env.date_today }}
+          git push origin artifacts
+
